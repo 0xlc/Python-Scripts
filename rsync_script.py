@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/python
 
 import sys
 import os
@@ -10,17 +10,17 @@ runtime_dir_path = os.path.dirname(os.path.abspath(sys.argv[0]))
 sys.path.append(os.path.abspath(os.path.join(runtime_dir_path, '../lib/python')))
 
 def deviceslist():
-    devicecontrollerlist: ["00:1f.2", "00:11.4"]
+    devicecontrollerlist = ["00:1f.2", "00:11.4"]
     satadevices = []
     if devicecontrollerlist == "":
         pass
     else:
 	for controller in devicecontrollerlist:
-        f = os.popen(("ls -l /dev/disk/by-path/pci-0000:%s* | grep -v part | cut -d'/' -f7") % controller)
-        for i in f.readlines():
-	    if not i in commands.getoutput("df -h /boot | grep /dev | awk '{print $1}'"):
-		i.strip("\n")
-		satadevices.append(i)
+            f = os.popen(("ls -l /dev/disk/by-path/pci-0000:%s* | grep -v part | cut -d'/' -f7") % controller)
+            for i in f.readlines():
+	        if not i in commands.getoutput("df -h /boot | grep /dev | awk '{print $1}'"):
+		    i.strip("\n")
+		    satadevices.append(i)
                     
     satadevices = sorted(satadevices)
     if not satadevices:
