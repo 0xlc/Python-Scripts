@@ -15,13 +15,13 @@ def deviceslist():
     if devicecontrollerlist == "":
         pass
     else:
-	for controller in devicecontrollerlist:
+        for controller in devicecontrollerlist:
             f = os.popen(("ls -l /dev/disk/by-path/pci-0000:%s* | grep -v part | cut -d'/' -f7") % controller)
             for i in f.readlines():
-	        if not i in commands.getoutput("df -h /boot | grep /dev | awk '{print $1}'"):
-		    i.strip("\n")
-		    satadevices.append(i)
-                    
+                if not i in commands.getoutput("df -h /boot | grep /dev | awk '{print $1}'"):
+                    i.strip("\n")
+                    satadevices.append(i)
+
     satadevices = sorted(satadevices)
     if not satadevices:
         print
@@ -57,20 +57,20 @@ def mount(cru_number):
     if cru_number in str(range(0, 6)):
         sd = devices[int(cru_number)]
         x = cru_number
-	if not os.path.exists("/mount/CRU%s") % x:
-	    os.mkdir(("/mount/CRU%s" % x), 777)
-	os.system("mount /dev/%s1 /mount/CRU%s 2>>/dev/null" % (sd, x)
+        if not os.path.exists("/mount/CRU%s") % x:
+            os.mkdir(("/mount/CRU%s" % x), 777)
+            os.system("mount /dev/%s1 /mount/CRU%s 2>>/dev/null" % (sd, x)
 
 def umount(cru_number):
     if cru_number in str(range(0, 6)):
         sd = devices[int(cru_number)]
         y = cru_number
-	if os.path.ismount("/mount/CRU%s" % x):
-	    os.system("umount /dev/%s1" % sd)
+    if os.path.ismount("/mount/CRU%s" % x):
+        os.system("umount /dev/%s1" % sd)
 
 def fix_perm():
     os.system("cd /media && find . -type d -exec chmod -v 777 {} \; && find . -type f -exec chmod -v 777 {} \;")
-    
+
 def main():
     devices = deviceslist()
     for sd in devices:
@@ -81,37 +81,37 @@ def main():
     cru_number = input("Insert the CRU number to use: ")
     status=ismount(devices[cru_number])
     if status == "mounted":
-	pass
+        pass
     elif status == "not mounted":
         print "/mount/CRU%s is not mounted. Mounting the drive.. " % cru_number
         mount(cru_number)
-    	sd = devices[int(cru_number)]
-    	print colors(sd, cru_number)
+        sd = devices[int(cru_number)]
+        print colors(sd, cru_number)
     if status == "mounted":
         print
         storedir = raw_input("Drag and drop the directory: ")
-	storedir = storedir.replace('"', '')
-	storedir = storedir.replace("'", "")
+        storedir = storedir.replace('"', '')
+        storedir = storedir.replace("'", "")
         print
-	print "Starting copying files from:" 
+        print "Starting copying files from:"
         print storedir
-	print "To:"
-	print "/mount/CRU%s" % cru_number
-	print
+        print "To:"
+        print "/mount/CRU%s" % cru_number
+        print
         os.system("cd %s ; rsync -vrP ./ /mount/CRU%s" % storedir, cru_number)
         print
-	print "Fixing permissions.."
-	fix_perm()
-	print
+        print "Fixing permissions.."
+        fix_perm()
+        print
         os.system("ls -lh /mount/CRU%s" % cru_number)
-	print
+        print
         print "\033[1;32mCopy completed.\033[1;m"
         print
-	print "Unmounting CRU%s.." % cru_number
+        print "Unmounting CRU%s.." % cru_number
         umount(cru_number)
         exit()
     else:
         print
-	print "Error. Use another slot please."
+        print "Error. Use another slot please."
 
 main()
